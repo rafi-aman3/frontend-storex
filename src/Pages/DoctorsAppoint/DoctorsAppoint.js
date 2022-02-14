@@ -49,7 +49,7 @@ function DoctorsAppoint() {
 		const newAppointmentInfo = {
 			...appointmentInfo,
 		};
-		newAppointmentInfo.date = value;
+		newAppointmentInfo.date = value.toISOString();
 		// console.log(newMedicineInfo);
 
 		// send to server

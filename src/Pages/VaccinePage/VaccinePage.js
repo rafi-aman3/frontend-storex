@@ -23,7 +23,7 @@ function VaccinePage() {
 		fetch(url)
 			.then((res) => res.json())
 			.then((data) => setVaccineLists(data));
-	}, []);
+	}, [user]);
 
 	const handleOnBlur = (e) => {
 		const field = e.target.name;
@@ -44,7 +44,8 @@ function VaccinePage() {
 		};
 		// console.log(newMedicineInfo);
 
-		newVaccineInfo.date = value.toLocaleDateString()
+		newVaccineInfo.date = value.toISOString()
+		console.log(newVaccineInfo)
 		// send to server
 		fetch("http://localhost:5000/vaccines", {
 			method: "POST",
