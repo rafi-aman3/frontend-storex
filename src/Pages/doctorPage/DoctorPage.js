@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import AddRecord from "../../Components/AddRecord/AddRecord";
 
 function DoctorPage() {
 
@@ -61,11 +63,11 @@ function DoctorPage() {
 					)}
 					<tbody>
 						{patients.map((item, index) => {
-							// console.log(item);
+							console.log(item);
 							return (
-								<tr key={index}>
+								<tr key={index} >
 									<th scope='row'>{index + 1}</th>
-									<td>{item.name}</td>
+									<td><Link to={`/addRecord/${item.userName}`}> {item.userName} </Link></td>
 									<td>{item.email}</td>
 								</tr>
 							);

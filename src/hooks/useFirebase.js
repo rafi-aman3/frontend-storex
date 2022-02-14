@@ -20,11 +20,6 @@ const useFirebase = () => {
 	const [user, setUser] = useState({});
 	const [error, setError] = useState();
 	const [isLoading, setIsLoading] = useState(true);
-	const [isDoctor, setIsDoctor] =  useState(false);
-	const [userDetails, setUserDetails] = useState({
-		user: user,
-		isDoctor: isDoctor
-	})
 
 	// create user with email password
 	const registerUser = (email, password, userName, history) => {
@@ -83,7 +78,6 @@ const useFirebase = () => {
 				}
 
 				setUser(newLoginData);
-				setIsDoctor(false);
 				fetch("http://localhost:5000/members", {
 					method: "POST",
 					headers: {
@@ -135,7 +129,7 @@ const useFirebase = () => {
 			setIsLoading(false);
 		});
 		return () => unsubscribe;
-	}, []);
+	}, [auth]);
 
 	return {
 		isLoading,

@@ -1,47 +1,32 @@
-import React, { useEffect, useState } from "react";
-import {
-	Accordion,
-	Button,
-	Dropdown,
-	DropdownButton,
-	Form,
-	FormControl,
-	InputGroup,
-	Modal,
-	Spinner,
-} from "react-bootstrap";
-import { FaDownload, FaPlusSquare, FaTrashAlt } from "react-icons/fa";
-import BackBtn from "../../BackBtn/BackBtn";
-import useAuth from "../../hooks/useAuth";
-import "./MyRecord.css";
+import React, { useEffect, useState } from 'react'
+import { Modal } from 'react-bootstrap';
+import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
 import Base64Downloader from 'react-base64-downloader'
+import { FaDownload, FaTrashAlt } from "react-icons/fa";
 
-function MyRecord() {
-	const { isLoading, user } = useAuth();
-	console.log(user.displayName)
-	
 
-	
-	// modal hide and show
-	const [show, setShow] = useState(false);
-	const handleClose = () => setShow(false);
-	const handleShow = () => setShow(true);
+function AddRecord() {
+  const { name } = useParams();
 
-	// input state change
-	const [description, setDescription] = useState(``);
-	const [fileType, setFileType] = useState(``);
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
 	const [image, setImage] = useState(null);
+	const [description, setDescription] = useState(``);
 
-	// load data from database
-	const [recordImgs, setRecordImgs] = useState([]);
+  const [recordImgs, setRecordImgs] = useState([]);
+
 	useEffect(() => {
-		const url = `http://localhost:5000/myrecords/${user.displayName}`;
+		const url = `http://localhost:5000/myrecords/${name}`;
 		fetch(url)
 			.then((res) => res.json())
-			.then((data) => setRecordImgs(data));
-	}, [user]);
+			.then((data) => {
+        setRecordImgs(data);
+      });
+	}, [name]);
 
-	const handleSubmit = (e) => {
+  const handleSubmit = (e) => {
 		e.preventDefault();
 		if (!image) {
 			// alert(`please add aimage`);
@@ -49,8 +34,8 @@ function MyRecord() {
 		}
 		const formData = new FormData();
 		formData.append("description", description);
-		formData.append("fileType", fileType);
 		formData.append("image", image);
+    formData.append('name', name)
 
 		fetch("http://localhost:5000/myrecords", {
 			method: "POST",
@@ -68,14 +53,12 @@ function MyRecord() {
 			.catch((err) => {
 				console.error("Error:", err);
 			});
-
-		window.location.reload();
 	};
 
-	const handleDelete = (id) => {
+  const handleDelete = (recordId) => {
 		const proceed = window.confirm("Are you sure to delete...?");
 		if (proceed) {
-			const url = `http://localhost:5000/myrecords/${id}`;
+			const url = `http://localhost:5000/myrecords/${recordId}`;
 			fetch(url, {
 				method: "DELETE",
 			})
@@ -85,22 +68,27 @@ function MyRecord() {
 					if (data.deletedCount > 0) {
 						// window.confirm("are you sure to delete item....?");
 						const remainingRecordImgs = recordImgs.filter(
-							(item) => item._id !== id
+							(item) => item._id !== recordId
 						);
 						setRecordImgs(remainingRecordImgs);
 					}
 				});
 		}
 	};
-	return (
-		<div className='container MyRecord-container mt-2'>
-			<h3 className='text-center mb-3 '>MyRecord</h3>
 
-			{/* load doctors to display */}
+  return (
+    <div className='container MyRecord-container mt-2'>
+			<h3 className='text-center mb-3 '>Add Record for {name}</h3>
+
+      <button className='upload-btn' onClick={handleShow}>
+				<img src='https://img.icons8.com/material-outlined/96/000000/add-image.png' />
+			</button>
+
+      {/* load doctors to display */}
 			<div class='row'>
 				{recordImgs.map((item, index) => {
 					console.log(item);
-					const { image, description, date, _id } = item;
+					const { image, description, _id } = item;
 
 					return (
 						<div key={index} class='col-sm-3'>
@@ -113,31 +101,27 @@ function MyRecord() {
 									/>
 								</div>
 								<div class='card-body'>
-									<p class='card-text'>Doctor Comment: {description}</p>
-									<p class='card-text'>
-										<small class='text-muted'>{date}</small>
-									</p>
+									<p class='card-text'>Doctors Comment: {description}</p>
 									<Base64Downloader base64={`data:image/jpeg;base64,${image}`} downloadName={`${description}`}>
 										<div className="btn btn-sm btn-outline-success">
 											<FaDownload/>
 										</div>
 									</Base64Downloader>
-									{/* <div
+									<div
 										className='btn btn-sm btn-outline-danger'
 										onClick={() => handleDelete(_id)}>
 										<FaTrashAlt />
-									</div> */}
+									</div>
 								</div>
 							</div>
 						</div>
 					);
 				})}
 			</div>
-			{isLoading && <Spinner className='text-center' animation='border' />}
-			{/* modal */}
-			<Modal show={show} onHide={handleClose}>
+
+      <Modal show={show} onHide={handleClose}>
 				<Modal.Header closeButton>
-					<h3>Add file</h3>
+					<h3>Add Report/Prescription</h3>
 				</Modal.Header>
 				<Modal.Body>
 					<form class='row g-3' onSubmit={handleSubmit}>
@@ -155,27 +139,17 @@ function MyRecord() {
 						<textarea
 							onBlur={(e) => setDescription(e.target.value)}
 							class='form-control'
-							placeholder='description'
+							placeholder='Doctor Comment/Advise'
 							aria-label='With textarea'></textarea>
 
-						{/* write file type */}
-						<div class='input-group mb-3'>
-							<input
-								onBlur={(e) => setFileType(e.target.value)}
-								type='text'
-								className='form-control'
-								placeholder='write file type'
-							/>
-						</div>
-
 						<button type='submit' class='btn btn-primary mb-3'>
-							submit data
+							Add
 						</button>
 					</form>
 				</Modal.Body>
 			</Modal>
-		</div>
-	);
+    </div>
+  )
 }
 
-export default MyRecord;
+export default AddRecord

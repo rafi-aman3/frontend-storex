@@ -27,6 +27,7 @@ import Register from "./Components/LoginPage/Register/Register";
 import AboutUs from "./Components/AboutUs/AboutUs";
 import DoctorPage from "./Pages/doctorPage/DoctorPage";
 import BackBtn from "./BackBtn/BackBtn";
+import AddRecord from "./Components/AddRecord/AddRecord";
 
 function App() {
 
@@ -80,6 +81,9 @@ function App() {
 						</Route>
 						<Route exact path='/DoctorPage'>
 							<DoctorPage />
+						</Route>
+						<Route exact path='/addRecord/:name'>
+							<AddRecord/>
 						</Route>
 					</Switch>
 					{/* <Footer /> */}
